@@ -6,12 +6,32 @@
 state( "Wholesome Slaughter" ) {}
 
 startup {
-    Assembly.Load( File.ReadAllBytes("Components/asl-help" ) ).CreateInstance( "Unity" );
+    Assembly.Load( File.ReadAllBytes( "Components/asl-help" ) ).CreateInstance( "Unity" );
     vars.Helper.GameName = "Wholesome Slaughter";
     vars.Helper.LoadSceneManager = true;
     vars.Helper.AlertLoadless();
     
-    vars.SceneNames = new List<String> {
+	settings.Add( "newgame",  true,  "Start on New Game"  );
+	settings.Add( "loadgame", false, "Start on Any Level" );
+	settings.Add( "credits",  true,  "End on Credits"     );
+	settings.Add( "levels",   true,  "Level Splitting"    );
+	
+	settings.CurrentDefaultParent = "levels";
+	settings.Add( "Tutorial Level", true, "Tutorial" );
+	settings.Add( "LevelOne",       true, "Level 1"  );
+	settings.Add( "LevelTwo",       true, "Level 2"  );
+	settings.Add( "LevelThree",     true, "Level 3"  );
+	settings.Add( "LevelFour",      true, "Level 4"  );
+	
+    vars.LoadScenes = new List<String> {
+        "loading screen",
+        "LevelOneLoadScreen",
+        "LevelTwoLoadScreen",
+        "LevelThreeLoadScreen",
+        "LevelFourLoadScreen"
+    };
+	
+    vars.GameScenes = new List<String> {
         "Tutorial Level",
         "LevelOne",
         "LevelTwo",
@@ -41,7 +61,11 @@ update {
 }
 
 start {
-    return( current.activeScene == "loading screen" && old.activeScene == "main menu" );
+	if( current.activeScene == "loading screen" && old.activeScene == "main menu" )
+		return settings["newgame"];
+	
+	if( vars.GameScenes.Contains( current.activeScene ) && vars.LoadScenes.Contains( old.activeScene ) )
+		return settings["loadgame"];
 }
 
 reset {
@@ -49,16 +73,15 @@ reset {
 }
 
 split {
-    if( current.activeScene != old.activeScene &&
-		current.activeScene.Contains( "LoadScreen" ) && vars.SceneNames.Contains( old.activeScene ) )
-        return true;
+    if( vars.LoadScenes.Contains( current.activeScene ) && vars.GameScenes.Contains( old.activeScene ) )
+        return settings[ old.activeScene ];
 	
     if( current.loadingScene == "credits" )
-		return true;
+		return settings["credits"];
 	
 	return false;
 }
 
 isLoading {
-    return( current.activeScene.ToLower().Contains( "load" ) );
+    return( vars.LoadScenes.Contains( current.activeScene ) );
 }
