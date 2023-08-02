@@ -40,13 +40,10 @@ startup {
         "LevelThree",
         "LevelFour"
     };
-    
-    vars.FinishedInitialLoad = false;
 }
 
 init {
-	// You can set this variable lower to reduce CPU usage.
-	refreshRate = 120;
+    vars.FinishedInitialLoad = false;
 }
 
 update {
@@ -65,22 +62,18 @@ update {
             return false;
         }
     }
-    
-    // DEBUG OUTPUT
-    //if( current.activeScene != old.activeScene )
-    //    print( "Scene change: \"" + old.activeScene + "\" -> \"" + current.activeScene + "\"." );
 }
 
 start {
-    if( current.activeScene == "loading screen" && old.activeScene == "main menu" )
-        return settings[ "newgame" ];
-    
-    if( vars.GameScenes.Contains( current.activeScene ) && vars.LoadScenes.Contains( old.activeScene ) )
-        return settings[ "loadgame" ];
+    if( settings[ "loadgame" ] ) {
+        return vars.LoadScenes.Contains( current.activeScene );
+    } else if ( settings[ "newgame" ] ) {
+        return ( current.activeScene == vars.LoadScenes[0] );
+    }
 }
 
 reset {
-    return( current.activeScene == "MainMenuLoadScreen" );
+    return( current.loadingScene == "MainMenuLoadScreen" );
 }
 
 split {
@@ -89,8 +82,6 @@ split {
     
     if( current.loadingScene == "credits" )
         return settings[ "credits" ];
-    
-    return false;
 }
 
 isLoading {
