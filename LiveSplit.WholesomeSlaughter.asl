@@ -44,6 +44,14 @@ startup {
 
 init {
     vars.FinishedInitialLoad = false;
+    current.activeScene = "";
+    current.loadingScene = "";
+}
+
+exit {
+    vars.FinishedInitialLoad = false;
+    current.activeScene = null;
+    current.loadingScene = null;
 }
 
 update {
@@ -59,7 +67,6 @@ update {
             vars.FinishedInitialLoad = true;
         else {
             current.activeScene = "program start";
-            return false;
         }
     }
 }
